@@ -7,6 +7,7 @@ class DataLoader:
         self.doc_type = doc_type
         self.cursor_mark = "*"
         self.end = False
+        self.num_found = 0
         if fields is None:
             self.fields = ["docid", "label_s", "uri_s"]
         else:
@@ -38,6 +39,7 @@ class DataLoader:
         if new_cursor_mark == self.cursor_mark:
             self.end = True
         self.cursor_mark = new_cursor_mark
+        self.num_found = data["response"]["numFound"]
         return data["response"]["docs"]
 
     def save_cursor_mark(self):

@@ -36,11 +36,11 @@ def setup():
     article_id int NOT NULL,
     auth1 int NOT NULL,
     auth2 int NOT NULL,
-    FOREIGN KEY(article_id) REFERENCES article(id),
-    FOREIGN KEY(auth1) REFERENCES author(id),
-    FOREIGN KEY(auth2) REFERENCES author(id)
     );"""
     )
+    # FOREIGN KEY(article_id) REFERENCES article(id),
+    # FOREIGN KEY(auth1) REFERENCES author(id),
+    # FOREIGN KEY(auth2) REFERENCES author(id)
 
     con.commit()
     return con
@@ -77,13 +77,13 @@ def insert_collaboration(auth1, auth2, articleId, con=None):
     cur = con.cursor()
 
     cur.execute(
-        "INSERT INTO collaboration (auth1, auth2, article_id) VALUES ("
+        'INSERT INTO collaboration (auth1, auth2, article_id) VALUES ("'
         + str(auth1)
-        + ","
+        + '","'
         + str(auth2)
-        + ","
+        + '","'
         + str(articleId)
-        + ")"
+        + '")'
     )
 
     if to_close:
@@ -105,21 +105,26 @@ def insert_document(id, con=None):
         con.close()
 
 
-def append_document(id, authors, con=None):
+def append_document(article_id, authors, con=None):
     to_close = False
     if con is None:
         con = sqlite3.connect("links.db")
         to_close = True
-
-    insert_document(id, con)
+    try:
+        insert_document(article_id, con)
+    except sqlite3.IntegrityError:
+        return
+     
     for id, lastname, firstname in authors:
         insert_author(id, lastname, firstname, con)
-
+    
     for author_index in range(len(authors)):
         for collaboration_index in range(author_index + 1, len(authors)):
             insert_collaboration(
-                authors[author_index][0], authors[collaboration_index][0], id, con
+                authors[author_index][0], authors[collaboration_index][0], article_id, con
             )
+
+    con.commit()
 
     if to_close:
         con.close()
