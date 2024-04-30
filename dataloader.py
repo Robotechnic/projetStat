@@ -40,6 +40,7 @@ class DataLoader:
             self.end = True
         self.cursor_mark = new_cursor_mark
         self.num_found = data["response"]["numFound"]
+        print(f"Found: {len(data['response']['docs'])}")
         return data["response"]["docs"]
 
     def save_cursor_mark(self):
@@ -54,7 +55,7 @@ class DataLoader:
 
 
 if __name__ == "__main__":
-    loader = DataLoader(fields=["authIdForm_i", "docid", "authLastName_s", "authFirstName_s"])
+    loader = DataLoader(fields=["authIdHal_i", "docid", "authLastName_s", "authFirstName_s"])
     while not loader.end:
         start = time.time()
         data = loader.next(10000)
