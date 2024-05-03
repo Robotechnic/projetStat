@@ -6,7 +6,7 @@ def connect():
         port=3306,
         user="scrapper",
         password="password",
-        database="hal"
+        database="hal_2019_2050"
     )
     con.autocommit = False
     con.auto_reconnect = True
@@ -15,6 +15,7 @@ def connect():
 def setup():
     con = connect()
     cur = con.cursor()
+    print("Create tables if not exists")
     cur.execute(
         """CREATE TABLE IF NOT EXISTS author
     (
@@ -44,6 +45,7 @@ def setup():
     )
 
     con.commit()
+    print("Tables created")
     return con
 
 
@@ -134,6 +136,11 @@ def append_document(article_id, authors, con=None):
                 data.append((auth1, auth2))
 
         cur = con.cursor()
+        RANGE = 3000
+        while len(data) > RANGE:
+            cur.executemany(query, data[:RANGE])
+            data = data[RANGE:]
+        
         cur.executemany(query, data)
 
     con.commit()
